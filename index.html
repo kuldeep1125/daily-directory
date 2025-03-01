@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Directory</title>
     <style>
-        /* CSS Variables */
+        
         :root {
             --primary-color: #2563eb;
             --secondary-color: #1e40af;
@@ -14,7 +14,7 @@
             --card-bg: #ffffff;
         }
 
-        /* Base Styles */
+
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +29,7 @@
             padding: 2rem 1rem;
         }
 
-        /* Header */
+    
         header {
             text-align: center;
             margin-bottom: 2.5rem;
@@ -50,7 +50,7 @@
             color: #64748b;
         }
 
-        /* Form Styling */
+ 
         .form-container {
             background: var(--card-bg);
             padding: 2rem;
@@ -99,7 +99,7 @@
             transform: scale(0.98);
         }
 
-        /* Directory Styles */
+
         .directory {
             background: var(--card-bg);
             border-radius: 1rem;
@@ -175,7 +175,7 @@
             background: #fee2e2;
         }
 
-        /* Responsive Design */
+    
         @media (max-width: 768px) {
             header h1 {
                 font-size: 2rem;
@@ -215,7 +215,7 @@
             }
         }
 
-        /* Empty State */
+   
         .empty-state {
             text-align: center;
             padding: 2rem;
@@ -232,7 +232,7 @@
     <div class="form-container">
         <form id="directory-form" class="form-grid">
             <input type="text" id="siteName" placeholder="Website Name" required>
-            <input type="url" id="siteURL" placeholder="https://example.com" required>
+            <input type="text" id="siteURL" placeholder="example.com or https://example.com" required>
             <button type="submit">Add Website</button>
         </form>
     </div>
@@ -243,114 +243,139 @@
             <input type="text" id="search" placeholder="Search websites...">
         </div>
         <ul id="directory-list" class="directory-list">
-            <!-- Items will be added here dynamically -->
+    
         </ul>
     </div>
 
     <script>
-        // Enhanced version with better storage handling
-        const form = document.getElementById('directory-form');
-        const directoryList = document.getElementById('directory-list');
-        const searchInput = document.getElementById('search');
 
-        // Load directory from localStorage
-        let directory = JSON.parse(localStorage.getItem('daily-directory')) || [];
+const form = document.getElementById('directory-form');
+const directoryList = document.getElementById('directory-list');
+const searchInput = document.getElementById('search');
 
-        // Save to localStorage with error handling
-        function saveDirectory() {
-            try {
-                localStorage.setItem('daily-directory', JSON.stringify(directory));
-            } catch (error) {
-                console.error('Error saving directory:', error);
-                alert('Error saving data. Your browser storage might be full.');
-            }
+
+let directory = JSON.parse(localStorage.getItem('daily-directory')) || [];
+
+
+function saveDirectory() {
+    try {
+        localStorage.setItem('daily-directory', JSON.stringify(directory));
+    } catch (error) {
+        console.error('Error saving directory:', error);
+        alert('Error saving data. Your browser storage might be full.');
+    }
+}
+
+
+function formatDisplayUrl(url) {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.hostname.replace(/^www\./, '');
+    } catch {
+        return url;
+    }
+}
+
+
+function renderDirectory(filter = '') {
+    directoryList.innerHTML = '';
+    
+    const filtered = directory.filter(item =>
+        item.name.toLowerCase().includes(filter.toLowerCase()) ||
+        item.url.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+        directoryList.innerHTML = `
+            <div class="empty-state">
+                No websites found. Start by adding one above!
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.className = 'directory-item';
+        
+
+        const displayUrl = formatDisplayUrl(item.url);
+
+        li.innerHTML = `
+            <div class="website-info">
+                <span class="website-name">${item.name}</span>
+                <a href="${item.url}" target="_blank" rel="noopener" class="website-url">
+                    ${displayUrl}
+                </a>
+            </div>
+            <button type="button" aria-label="Remove ${item.name}">
+                &times;
+            </button>
+        `;
+        
+        li.querySelector('button').addEventListener('click', () => removeItem(index));
+        directoryList.appendChild(li);
+    });
+}
+
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = form.siteName.value.trim();
+    let url = form.siteURL.value.trim();
+
+    if (!name || !url) return;
+
+ 
+    try {
+
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = `https://${url}`;
         }
+        
 
-        // Render directory with empty state
-        function renderDirectory(filter = '') {
-            directoryList.innerHTML = '';
-            
-            const filtered = directory.filter(item =>
-                item.name.toLowerCase().includes(filter.toLowerCase()) ||
-                item.url.toLowerCase().includes(filter.toLowerCase())
-            );
+        const parsedUrl = new URL(url);
+        url = parsedUrl.href; 
+    } catch {
+        alert('Please enter a valid URL or domain name (e.g., example.com)');
+        return;
+    }
 
-            if (filtered.length === 0) {
-                directoryList.innerHTML = `
-                    <div class="empty-state">
-                        No websites found. Start by adding one above!
-                    </div>
-                `;
-                return;
-            }
+    directory.push({ name, url });
+    saveDirectory();
+    renderDirectory(searchInput.value);
+    form.reset();
+    form.siteName.focus();
+});
 
-            filtered.forEach((item, index) => {
-                const li = document.createElement('li');
-                li.className = 'directory-item';
-                li.innerHTML = `
-                    <a href="${item.url}" target="_blank" rel="noopener">
-                        ${item.name}
-                    </a>
-                    <button type="button" aria-label="Remove ${item.name}">
-                        &times;
-                    </button>
-                `;
-                li.querySelector('button').addEventListener('click', () => removeItem(index));
-                directoryList.appendChild(li);
-            });
-        }
 
-        // Add new item with validation
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = form.siteName.value.trim();
-            const url = form.siteURL.value.trim();
+function removeItem(index) {
+    if (confirm('Are you sure you want to remove this website?')) {
+        directory.splice(index, 1);
+        saveDirectory();
+        renderDirectory(searchInput.value);
+    }
+}
 
-            if (!name || !url) return;
 
-            // Basic URL validation
-            try {
-                new URL(url);
-            } catch {
-                alert('Please enter a valid URL (e.g., https://example.com)');
-                return;
-            }
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+        renderDirectory(searchInput.value);
+    }, 300);
+});
 
-            directory.push({ name, url });
-            saveDirectory();
-            renderDirectory(searchInput.value);
-            form.reset();
-            form.siteName.focus();
-        });
 
-        // Remove item with confirmation
-        function removeItem(index) {
-            if (confirm('Are you sure you want to remove this website?')) {
-                directory.splice(index, 1);
-                saveDirectory();
-                renderDirectory(searchInput.value);
-            }
-        }
+renderDirectory();
 
-        // Search functionality with debounce
-        let searchTimeout;
-        searchInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                renderDirectory(searchInput.value);
-            }, 300);
-        });
 
-        // Initial render
+window.addEventListener('storage', (e) => {
+    if (e.key === 'daily-directory') {
+        directory = JSON.parse(e.newValue);
         renderDirectory();
-
-        // Sync across tabs
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'daily-directory') {
-                directory = JSON.parse(e.newValue);
-                renderDirectory();
-            }
-        });
+    }
+});
     </script>
 </body>
 </html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Directory</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --background: #f8fafc;
+            --text-color: #1e293b;
+            --card-bg: #ffffff;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            letter-spacing: -0.025em;
+        }
+
+        header p {
+            font-size: 1.125rem;
+            color: #64748b;
+        }
+
+        /* Form Styling */
+        .form-container {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-container input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-container button {
+            padding: 0.875rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .form-container button:hover {
+            background: var(--secondary-color);
+        }
+
+        .form-container button:active {
+            transform: scale(0.98);
+        }
+
+        /* Directory Styles */
+        .directory {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .directory-header {
+            padding: 1.5rem;
+            background: #f1f5f9;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .directory-header input {
+            flex: 1 1 300px;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            min-width: 250px;
+        }
+
+        .directory-list {
+            list-style: none;
+        }
+
+        .directory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.2s;
+        }
+
+        .directory-item:last-child {
+            border-bottom: none;
+        }
+
+        .directory-item:hover {
+            background: #f8fafc;
+        }
+
+        .directory-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .directory-item a:hover {
+            text-decoration: underline;
+        }
+
+        .directory-item button {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .directory-item button:hover {
+            background: #fee2e2;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .form-container {
+                padding: 1.5rem;
+            }
+
+            .directory-header {
+                padding: 1rem;
+            }
+
+            .directory-item {
+                padding: 1rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+
+            header h1 {
+                font-size: 1.75rem;
+            }
+
+            .form-container {
+                padding: 1rem;
+            }
+
+            .form-container button {
+                width: 100%;
+            }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Daily Directory</h1>
+        <p>Your personal collection of favorite websites - Always saved automatically</p>
+    </header>
+
+    <div class="form-container">
+        <form id="directory-form" class="form-grid">
+            <input type="text" id="siteName" placeholder="Website Name" required>
+            <input type="url" id="siteURL" placeholder="https://example.com" required>
+            <button type="submit">Add Website</button>
+        </form>
+    </div>
+
+    <div class="directory">
+        <div class="directory-header">
+            <h2>Saved Websites</h2>
+            <input type="text" id="search" placeholder="Search websites...">
+        </div>
+        <ul id="directory-list" class="directory-list">
+            <!-- Items will be added here dynamically -->
+        </ul>
+    </div>
+
+    <script>
+        // Enhanced version with better storage handling
+        const form = document.getElementById('directory-form');
+        const directoryList = document.getElementById('directory-list');
+        const searchInput = document.getElementById('search');
+
+        // Load directory from localStorage
+        let directory = JSON.parse(localStorage.getItem('daily-directory')) || [];
+
+        // Save to localStorage with error handling
+        function saveDirectory() {
+            try {
+                localStorage.setItem('daily-directory', JSON.stringify(directory));
+            } catch (error) {
+                console.error('Error saving directory:', error);
+                alert('Error saving data. Your browser storage might be full.');
+            }
+        }
+
+        // Render directory with empty state
+        function renderDirectory(filter = '') {
+            directoryList.innerHTML = '';
+            
+            const filtered = directory.filter(item =>
+                item.name.toLowerCase().includes(filter.toLowerCase()) ||
+                item.url.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                directoryList.innerHTML = `
+                    <div class="empty-state">
+                        No websites found. Start by adding one above!
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'directory-item';
+                li.innerHTML = `
+                    <a href="${item.url}" target="_blank" rel="noopener">
+                        ${item.name}
+                    </a>
+                    <button type="button" aria-label="Remove ${item.name}">
+                        &times;
+                    </button>
+                `;
+                li.querySelector('button').addEventListener('click', () => removeItem(index));
+                directoryList.appendChild(li);
+            });
+        }
+
+        // Add new item with validation
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = form.siteName.value.trim();
+            const url = form.siteURL.value.trim();
+
+            if (!name || !url) return;
+
+            // Basic URL validation
+            try {
+                new URL(url);
+            } catch {
+                alert('Please enter a valid URL (e.g., https://example.com)');
+                return;
+            }
+
+            directory.push({ name, url });
+            saveDirectory();
+            renderDirectory(searchInput.value);
+            form.reset();
+            form.siteName.focus();
+        });
+
+        // Remove item with confirmation
+        function removeItem(index) {
+            if (confirm('Are you sure you want to remove this website?')) {
+                directory.splice(index, 1);
+                saveDirectory();
+                renderDirectory(searchInput.value);
+            }
+        }
+
+        // Search functionality with debounce
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderDirectory(searchInput.value);
+            }, 300);
+        });
+
+        // Initial render
+        renderDirectory();
+
+        // Sync across tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'daily-directory') {
+                directory = JSON.parse(e.newValue);
+                renderDirectory();
+            }
+        });
+    </script>
+</body>
+</html>
